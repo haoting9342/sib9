@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/nokia/sib9/build",
+  "command": "/usr/bin/gcc  -I/home/nokia/sib9/slog/src  -g   -Wall -O2 -pthread -o CMakeFiles/slog-sample.dir/example/example.c.o   -c /home/nokia/sib9/slog/example/example.c",
+  "file": "/home/nokia/sib9/slog/example/example.c"
+},
+{
+  "directory": "/home/nokia/sib9/build",
+  "command": "/usr/bin/gcc   -g   -Wall -O2 -o CMakeFiles/slog.dir/src/slog.c.o   -c /home/nokia/sib9/slog/src/slog.c",
+  "file": "/home/nokia/sib9/slog/src/slog.c"
+}
+]

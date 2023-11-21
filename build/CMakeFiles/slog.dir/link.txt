@@ -1,0 +1,2 @@
+/usr/bin/ar qc libslog.a  CMakeFiles/slog.dir/src/slog.c.o
+/usr/bin/ranlib libslog.a

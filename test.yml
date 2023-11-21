@@ -1,0 +1,14 @@
+plugins:
+  tsn_mqtt_time_domain: 
+    path: ./tsn_mqtt_time_domain.so
+    disabled: false
+    extra:
+      ptp_tsn_net_device: /dev/ptp0
+      ptp_5g_device: /dev/ptp1
+      mosq:
+        host: 10.108.187.49
+        port: 1883
+        topic: tsn_mqtt_time_domain
+      mosq_connector_library: mosquittoConnector
+    dependency:
+      - mosquittoConnector

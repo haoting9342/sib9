@@ -1,0 +1,38 @@
+plugins: 
+  mosquittoConnector: 
+    path: ./lib/mosquittoConnector.so
+    disabled: false
+  shell: 
+    path: ./lib/shell.so
+    disabled: false
+    extra:
+        port:  7878
+    dependency: 
+      - mosquittoConnector
+  tsn_mqtt_time_domain: 
+    path: ./lib/tsn_mqtt_time_domain.so
+    disabled: false
+    extra:
+      ptp_tsn_net_device: /dev/ptp0
+      irgb_device: 0
+      mosq:
+        host: 10.108.187.51
+        port: 1883
+        topic: tsn_mqtt_time_domain
+      mosq_connector_library: mosquittoConnector
+    dependency:
+      - mosquittoConnector
+  irgb_reader:
+    path: ./lib/irgb.reader.so
+    disabled: false
+    extra:
+      irgb_device: 0
+      jitter:
+        ptp_device: /dev/ptp0
+        time_offset_correction: -1 # >=0 fix time offset correction, -1 means always align the time in the first time. 
+        interval: 1 # in seconds
+        reporting_topic: jitter
+        host: 10.108.187.51
+        port: 1883
+globalSettings:
+    test: test

@@ -1,0 +1,1 @@
+/usr/bin/gcc -g  -rdynamic CMakeFiles/slog-sample.dir/example/example.c.o  -o slog-sample  libslog.a -pthread 

@@ -1,0 +1,3 @@
+load pcie driver:
+sudo insmod ch36x.ko
+

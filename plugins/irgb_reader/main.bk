@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <errno.h>   
+#include <unistd.h>
+#include <string.h>
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/stat.h> 
+#include <pthread.h>
+//#include "ch36x_lib.h"
+#include "pcielib.h"
+#include <sys/time.h>
+#include <dirent.h>
+#include <math.h>
+
+
+
+#define DEV_IDX 0
+
+static void print_menu(void);
+
+void InterruptEvent(void)
+{
+	//Uptime PC system time
+	Update_SystemTime(DEV_IDX);
+}
+
+int main(int argc, char *argv[])
+{
+	int ret;
+	double result = pow(2, 3);
+	
+	ret = Open_Device(DEV_IDX);
+	if (ret != 0)
+	{
+		printf("Open_Device err!\n");
+		goto exit;
+	}
+	
+	print_menu();
+    printf("> ");
+	
+	while(1)
+	{
+		char cmd;
+		scanf("%c", &cmd);
+		switch(cmd)
+		{
+			case '0': //中断开关打开后，只有系统状态sysStatus为4（锁定）时，板卡才会产生中断
+				SetIntRoutine(DEV_IDX,(void*)InterruptEvent);
+			break;
+			case '1':
+				SetIntRoutine(DEV_IDX,NULL);
+			break;
+			case '2':{
+				int sysStatus;
+				int SyncAccuacy;
+				if(Get_Sys_Status(DEV_IDX,&sysStatus,&SyncAccuacy)< 0)
+					printf("Get_Sys_Status error.\n");
+				else
+					printf("Get_Sys_Status: sysStatus:%d, SyncAccuacy=%d ns.\n",sysStatus,SyncAccuacy);
+			break;}
+			case '3':{
+				Time_Msg msg;
+				if(Get_Sys_Time(DEV_IDX,&msg) < 0)
+					printf("Get_Sys_Time error.\n");
+				else
+					printf("Get_Sys_Time: %04d-%02d-%02d %02d:%02d:%02d .\n",msg.Year,msg.Month,msg.Day,msg.Hour,msg.Min,msg.Sec);
+			break;}
+			case '4':{
+				unsigned long sec_ns;
+				unsigned long sec_t;
+				if(Get_Sys_Time_Sec_And_Ns(DEV_IDX,&sec_t,&sec_ns) < 0){
+					printf("Get_Sys_Time_Sec_And_Ns error.\n");
+				}
+				else{
+					Time_Msg msg;
+					time_t sec = (time_t)(sec_t);
+					struct tm *ptr = localtime(&sec);
+					msg.Year = ( unsigned short) ptr->tm_year + 1900;
+					msg.Month = ptr->tm_mon + 1;
+					msg.Day = ptr->tm_mday;
+					msg.Hour = ptr->tm_hour;
+					msg.Min = ptr->tm_min;
+					msg.Sec = ptr->tm_sec;
+					msg.Ns = sec_ns/100;
+					
+					printf("Get_Sys_Time_Sec_And_Ns: sec:%ld, ns:%ld \n",sec_t,sec_ns);
+					printf("Get_Sys_Time_Sec_And_Ns: %04d-%02d-%02d %02d:%02d:%02d.%07d .\n",\
+					msg.Year,msg.Month,msg.Day,msg.Hour,msg.Min,msg.Sec,msg.Ns);
+				}
+			break;}
+			case 'x': 
+			case 'X': 
+				goto exit;
+			break;
+			case 'h': 
+			case 'H': 
+				print_menu();
+			break;
+			default:
+				printf("> ");
+			break;
+		}
+		
+			
+		usleep(1000);
+	}
+	
+ 	exit:
+	ret = Close_Device(DEV_IDX);
+	if (ret != 0) {
+		printf("Close_Device error.\n");	
+	}
+
+	return ret;
+}
+
+static void print_menu(void)
+{
+	printf("pcie test definition:\n");
+    printf("Select from following commands :\n");
+	printf("\t0                  			 -- open pcie interrupt\n");
+    printf("\t1                  			 -- close pcie interrupt\n");
+    printf("\t2                 			 -- read pcie status\n"); 
+	printf("\t3                 			 -- read pcie time(date & time)\n"); 
+	printf("\t4                 			 -- read pcie time(sec & ns)\n"); 
+    printf("\tx                  			 -- exit\n");
+    printf("\th                  			 -- print this list\n");
+}
